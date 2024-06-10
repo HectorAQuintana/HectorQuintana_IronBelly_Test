@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameObjectPool : MonoBehaviour
 {
@@ -6,14 +8,13 @@ public class GameObjectPool : MonoBehaviour
     private GameObject prefab;
     [SerializeField] 
     private int initialPoolSize = 10;
-    [SerializeField]
-    private bool randomIniPos = false;
-    [SerializeField]
-    private Vector3 iniPosMaxRange = Vector3.one;
-    [SerializeField]
-    private Vector3 iniPosMinRange = Vector3.one;
 
     private Pool<GameObject> pool;
+    private List<GameObject> activeObjects = new List<GameObject>();
+    private int objectsSpawned = 0;
+
+    public UnityAction OnObjectPooled;
+    public UnityAction OnObjectReturned;
 
     void Start()
     {
@@ -23,42 +24,48 @@ public class GameObjectPool : MonoBehaviour
     private GameObject CreateObject(GameObject prefab)
     {
         GameObject obj = Instantiate(prefab);
-        SetRandomPos(obj);
         obj.SetActive(false);
         return obj;
-    }
-
-    private void SetRandomPos(GameObject obj)
-    {
-        if(!randomIniPos)
-        {
-            return;
-        }
-
-        float x = Random.Range(iniPosMinRange.x, iniPosMaxRange.x);
-        float y = Random.Range(iniPosMinRange.y, iniPosMaxRange.y);
-        float z = Random.Range(iniPosMinRange.z, iniPosMaxRange.z);
-
-        obj.transform.position = new Vector3(x, y, z);
     }
 
     public GameObject GetPooledObject()
     {
         GameObject obj = pool.GetObject();
         obj.SetActive(true);
+        objectsSpawned++;
+        activeObjects.Add(obj);
+        OnObjectPooled.Invoke();
         return obj;
     }
 
-    public void ActivatePooledObject()
+    public void ActivatePooledObjects(int qty)
     {
-        GameObject obj = pool.GetObject();
-        obj.SetActive(true);
+        for (int i = 0; i < qty; i++)
+        {
+            GetPooledObject();
+        }
     }
 
     public void ReturnPooledObject(GameObject obj)
     {
         obj.SetActive(false);
         pool.ReturnObject(obj);
+        objectsSpawned--;
+        OnObjectReturned.Invoke();
+        activeObjects.Remove(obj);
+    }
+
+    public void ReturnPooledObjects(int qty)
+    {
+        if (qty > activeObjects.Count)
+        {
+            qty = activeObjects.Count;
+        }
+
+        for(int i = 0; i < qty; i++)  
+        {
+            ReturnPooledObject(activeObjects[0]);
+        }
     }
 
     public void ExpandPool(int amount)
@@ -70,4 +77,6 @@ public class GameObjectPool : MonoBehaviour
             pool.ReturnObject(obj);
         }
     }
+
+    public int GetObjectsCount => objectsSpawned;
 }

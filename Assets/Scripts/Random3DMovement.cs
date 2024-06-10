@@ -19,8 +19,13 @@ public class Random3DMovement : MonoBehaviour
 
     void Start()
     {
-        SetRandomTarget();
         StartCoroutine(UpdateTargetPosition());
+    }
+
+    private void OnEnable()
+    {
+        SetRandomTarget();
+        SetInitialPosition();
     }
 
     void Update()
@@ -28,12 +33,22 @@ public class Random3DMovement : MonoBehaviour
         MoveTowardsTarget();
     }
 
+    private void SetInitialPosition()
+    {
+        transform.position = GetRandomRangePosition();
+    }
+
     private void SetRandomTarget()
+    {
+        targetPosition = GetRandomRangePosition();
+    }
+
+    private Vector3 GetRandomRangePosition()
     {
         float xPos = Random.Range(-zoneX, zoneX);
         float yPos = Random.Range(-zoneY, zoneY);
         float zPos = Random.Range(-zoneZ, zoneZ);
-        targetPosition = new Vector3(xPos, yPos, zPos);
+        return new Vector3(xPos, yPos, zPos);
     }
 
     private void MoveTowardsTarget()
