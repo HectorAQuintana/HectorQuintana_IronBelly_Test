@@ -1,12 +1,15 @@
+using System;
 using System.Collections.Generic;
 
-public class Pool<T> where T : new()
+public class Pool<T>
 {
     private Queue<T> poolQueue;
+    private Func<T> OnCreate;
 
-    public Pool(int initialSize)
+    public Pool(int initialSize, Func<T> OnCreate)
     {
         poolQueue = new Queue<T>();
+        this.OnCreate = OnCreate;
         ExpandPool(initialSize);
     }
 
@@ -14,7 +17,7 @@ public class Pool<T> where T : new()
     {
         for (int i = 0; i < amount; i++)
         {
-            poolQueue.Enqueue(new T());
+            poolQueue.Enqueue(OnCreate());
         }
     }
 
