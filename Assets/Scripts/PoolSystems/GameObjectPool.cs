@@ -6,6 +6,12 @@ public class GameObjectPool : MonoBehaviour
     private GameObject prefab;
     [SerializeField] 
     private int initialPoolSize = 10;
+    [SerializeField]
+    private bool randomIniPos = false;
+    [SerializeField]
+    private Vector3 iniPosMaxRange = Vector3.one;
+    [SerializeField]
+    private Vector3 iniPosMinRange = Vector3.one;
 
     private Pool<GameObject> pool;
 
@@ -17,8 +23,23 @@ public class GameObjectPool : MonoBehaviour
     private GameObject CreateObject(GameObject prefab)
     {
         GameObject obj = Instantiate(prefab);
+        SetRandomPos(obj);
         obj.SetActive(false);
         return obj;
+    }
+
+    private void SetRandomPos(GameObject obj)
+    {
+        if(!randomIniPos)
+        {
+            return;
+        }
+
+        float x = Random.Range(iniPosMinRange.x, iniPosMaxRange.x);
+        float y = Random.Range(iniPosMinRange.y, iniPosMaxRange.y);
+        float z = Random.Range(iniPosMinRange.z, iniPosMaxRange.z);
+
+        obj.transform.position = new Vector3(x, y, z);
     }
 
     public GameObject GetPooledObject()

@@ -153,7 +153,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 347783505293258843, guid: 2b396fa2c8941f44ab23874897bf3434, type: 3}
   initialPoolSize: 10
-  initialActiveObjects: 0
+  randomIniPos: 1
+  iniPosMaxRange: {x: 5, y: 5, z: 5}
+  iniPosMinRange: {x: -5, y: -5, z: -5}
 --- !u!4 &370603117
 Transform:
   m_ObjectHideFlags: 0
